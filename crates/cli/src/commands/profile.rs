@@ -7,6 +7,10 @@ use prism_core::types::config::NetworkConfig;
 pub struct ProfileArgs {
     /// Transaction hash to profile.
     pub tx_hash: String,
+
+    /// Output profile to a file instead of stdout.
+    #[arg(long, short)]
+    pub output_file: Option<String>,
 }
 
 pub async fn run(
@@ -22,7 +26,14 @@ pub async fn run(
 
     progress.finish_and_clear();
 
-    crate::output::print_resource_profile(&trace.resource_profile, output_format)?;
+    let output = crate::output::format_resource_profile(&trace.resource_profile, output_format)?;
+
+    if let Some(path) = args.output_file {
+        std::fs::write(&path, &output)?;
+        println!("Profile written to {path}");
+    } else {
+        println!("{output}");
+    }
 
     Ok(())
 }
