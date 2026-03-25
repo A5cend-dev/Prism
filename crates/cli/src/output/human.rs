@@ -2,7 +2,7 @@
 
 use prism_core::types::report::DiagnosticReport;
 
-use crate::output::renderers::BudgetBar;
+use crate::output::renderers::render_fix_list;
 
 /// Print a diagnostic report in human-readable colored format.
 pub fn print_report(report: &DiagnosticReport) -> anyhow::Result<()> {
@@ -12,27 +12,13 @@ pub fn print_report(report: &DiagnosticReport) -> anyhow::Result<()> {
         report.error_name, report.error_category, report.error_code
     );
     println!("Summary: {}", report.summary);
-
-    if let Some(context) = &report.transaction_context {
-        println!(
-            "{}",
-            BudgetBar::new(
-                "CPU",
-                context.resources.cpu_instructions_used,
-                context.resources.cpu_instructions_limit
-            )
-            .render()
-        );
-        println!(
-            "{}",
-            BudgetBar::new(
-                "RAM",
-                context.resources.memory_bytes_used,
-                context.resources.memory_bytes_limit
-            )
-            .render()
-        );
+    
+    // Render and print the actionable fixes section
+    let fix_list = render_fix_list(report);
+    if !fix_list.is_empty() {
+        println!();
+        print!("{}", fix_list);
     }
-
+    
     Ok(())
 }
