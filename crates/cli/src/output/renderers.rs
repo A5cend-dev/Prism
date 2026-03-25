@@ -44,44 +44,50 @@ impl BudgetBar {
         Self { label, used, limit }
     }
 
-    pub fn render(&self) -> String {
-        if self.limit == 0 {
-            return format!("{}: [n/a] 0%", self.label);
+    let mut output = String::new();
+    output.push_str("Actionable Fixes:\n");
+
+    for (index, fix) in report.suggested_fixes.iter().enumerate() {
+        let icon = get_fix_icon(fix);
+        let difficulty_badge = get_difficulty_badge(&fix.difficulty);
+        
+        output.push_str(&format!("  {} {}{}\n", icon, fix.description, difficulty_badge));
+        
+        if fix.requires_upgrade {
+            output.push_str("    ⚡ May require contract upgrade\n");
         }
-
-        let percent = self.percent();
-        let filled = ((percent as usize) * BAR_WIDTH + 50) / 100;
-        let filled = filled.min(BAR_WIDTH);
-        let bar = format!(
-            "{}{}",
-            "█".repeat(filled),
-            "░".repeat(BAR_WIDTH.saturating_sub(filled))
-        );
-
-        format!(
-            "{}: [{}] {}% ({}/{})",
-            self.label,
-            self.colorize(bar),
-            percent,
-            self.used,
-            self.limit
-        )
+        
+        if let Some(example) = &fix.example {
+            output.push_str(&format!("    📄 Example: {}\n", example));
+        }
+        
+        // Add a blank line between fixes except for the last one
+        if index < report.suggested_fixes.len() - 1 {
+            output.push('\n');
+        }
     }
 
-    fn percent(&self) -> u64 {
-        if self.limit == 0 {
-            return 0;
-        }
+    output
+}
 
-        ((self.used.saturating_mul(100)) / self.limit).min(100)
+/// Returns the appropriate icon for a suggested fix based on its characteristics.
+fn get_fix_icon(fix: &SuggestedFix) -> &'static str {
+    if fix.requires_upgrade {
+        "🔒"
+    } else if fix.example.is_some() {
+        "📋"
+    } else {
+        "🔧"
     }
+}
 
-    fn colorize(&self, bar: String) -> ColoredString {
-        match self.percent() {
-            0..=69 => bar.green(),
-            70..=89 => bar.yellow(),
-            _ => bar.red(),
-        }
+/// Returns a badge indicating the difficulty level of the fix.
+fn get_difficulty_badge(difficulty: &str) -> String {
+    match difficulty.to_lowercase().as_str() {
+        "easy" => " [easy]".to_string(),
+        "medium" => " [medium]".to_string(),
+        "hard" => " [hard]".to_string(),
+        _ => String::new(),
     }
 }
 
@@ -90,27 +96,62 @@ mod tests {
     use super::{render_section_header, BudgetBar, SectionHeader};
 
     #[test]
-    fn renders_expected_percentage() {
-        let rendered = BudgetBar::new("CPU", 60, 100).render();
-
-        assert!(rendered.contains("CPU:"));
-        assert!(rendered.contains("60%"));
-        assert!(rendered.contains("██████"));
+    fn test_render_fix_list_with_fixes() {
+        let report = create_test_report();
+        let output = render_fix_list(&report);
+        
+        assert!(output.contains("Actionable Fixes:"));
+        assert!(output.contains("🔧"));
+        assert!(output.contains("📋"));
+        assert!(output.contains("🔒"));
+        assert!(output.contains("[easy]"));
+        assert!(output.contains("[medium]"));
+        assert!(output.contains("[hard]"));
+        assert!(output.contains("May require contract upgrade"));
     }
 
     #[test]
-    fn clamps_over_limit_usage_to_full_bar() {
-        let rendered = BudgetBar::new("RAM", 150, 100).render();
-
-        assert!(rendered.contains("100%"));
-        assert!(rendered.contains("██████████"));
+    fn test_render_fix_list_empty() {
+        let mut report = create_test_report();
+        report.suggested_fixes = vec![];
+        let output = render_fix_list(&report);
+        
+        assert!(output.is_empty());
     }
 
     #[test]
-    fn renders_na_for_missing_limit() {
-        let rendered = BudgetBar::new("CPU", 0, 0).render();
+    fn test_get_fix_icon() {
+        let fix_with_example = SuggestedFix {
+            description: "Test".to_string(),
+            difficulty: "easy".to_string(),
+            requires_upgrade: false,
+            example: Some("code".to_string()),
+        };
+        assert_eq!(get_fix_icon(&fix_with_example), "📋");
 
-        assert_eq!(rendered, "CPU: [n/a] 0%");
+        let fix_requires_upgrade = SuggestedFix {
+            description: "Test".to_string(),
+            difficulty: "easy".to_string(),
+            requires_upgrade: true,
+            example: None,
+        };
+        assert_eq!(get_fix_icon(&fix_requires_upgrade), "🔒");
+
+        let fix_standard = SuggestedFix {
+            description: "Test".to_string(),
+            difficulty: "easy".to_string(),
+            requires_upgrade: false,
+            example: None,
+        };
+        assert_eq!(get_fix_icon(&fix_standard), "🔧");
+    }
+
+    #[test]
+    fn test_get_difficulty_badge() {
+        assert_eq!(get_difficulty_badge("easy"), " [easy]");
+        assert_eq!(get_difficulty_badge("medium"), " [medium]");
+        assert_eq!(get_difficulty_badge("hard"), " [hard]");
+        assert_eq!(get_difficulty_badge("unknown"), "");
     }
 
     #[test]

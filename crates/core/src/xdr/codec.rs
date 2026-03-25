@@ -3,8 +3,8 @@
 //! Handles serialization/deserialization of transaction envelopes, results,
 //! ledger entries, SCVal, and SCSpecEntry types.
 
-use crate::types::error::{PrismError, PrismResult};
-use base64::{engine::general_purpose::STANDARD, Engine as _};
+use crate::types::error::{ PrismError, PrismResult };
+use base64::{ engine::general_purpose::STANDARD, Engine as _ };
 
 /// Decode a base64-encoded XDR transaction result.
 ///
@@ -26,13 +26,13 @@ pub fn encode_xdr_base64(bytes: &[u8]) -> String {
 
 /// Decode a transaction hash from hex string.
 pub fn decode_tx_hash(hash_hex: &str) -> PrismResult<[u8; 32]> {
-    let bytes = hex_decode(hash_hex)
-        .map_err(|e| PrismError::XdrError(format!("Invalid tx hash hex: {e}")))?;
+    let bytes = hex_decode(hash_hex).map_err(|e|
+        PrismError::XdrError(format!("Invalid tx hash hex: {e}"))
+    )?;
     if bytes.len() != 32 {
-        return Err(PrismError::XdrError(format!(
-            "Transaction hash must be 32 bytes, got {}",
-            bytes.len()
-        )));
+        return Err(
+            PrismError::XdrError(format!("Transaction hash must be 32 bytes, got {}", bytes.len()))
+        );
     }
     let mut arr = [0u8; 32];
     arr.copy_from_slice(&bytes);
@@ -53,8 +53,9 @@ fn hex_decode(input: &str) -> Result<Vec<u8>, String> {
     (0..input.len())
         .step_by(2)
         .map(|i| {
-            u8::from_str_radix(&input[i..i + 2], 16)
-                .map_err(|e| format!("Invalid hex at position {i}: {e}"))
+            u8::from_str_radix(&input[i..i + 2], 16).map_err(|e|
+                format!("Invalid hex at position {i}: {e}")
+            )
         })
         .collect()
 }
