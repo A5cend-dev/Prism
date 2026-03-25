@@ -29,7 +29,8 @@ const BUILD_HASH: &str = env!("PRISM_BUILD_HASH");
     name = "prism",
     disable_version_flag = true,
     about,
-    long_about = None
+    long_about = None,
+    arg_required_else_help = true
 )]
 #[command(propagate_version = true)]
 struct Cli {
