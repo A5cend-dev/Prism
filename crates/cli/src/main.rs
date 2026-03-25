@@ -183,6 +183,16 @@ mod tests {
     }
 
     #[test]
+    fn parses_diff_tx_hash_argument() {
+        let cli = Cli::try_parse_from(["prism", "diff", "deadbeef"]).expect("cli should parse");
+
+        match cli.command {
+            Commands::Diff(args) => assert_eq!(args.tx_hash, "deadbeef"),
+            _ => panic!("expected diff command"),
+        }
+    }
+
+    #[test]
     fn defaults_to_warn_without_verbose() {
         let warn = build_log_filter(0).to_string();
         let debug = build_log_filter(1).to_string();
