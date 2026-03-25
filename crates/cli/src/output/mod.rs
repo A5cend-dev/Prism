@@ -8,6 +8,7 @@ use prism_core::types::{
 pub mod compact;
 pub mod human;
 pub mod json;
+pub mod renderers;
 pub mod auth_tree;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -66,6 +67,8 @@ pub fn print_resource_profile(
     Ok(())
 }
 
+<<<<<<< HEAD
+=======
 pub fn format_resource_profile(profile: &ResourceProfile, output_format: &str) -> anyhow::Result<String> {
     Ok(match OutputMode::parse(output_format) {
         OutputMode::Json => serde_json::to_string_pretty(profile)?,
@@ -88,6 +91,7 @@ pub fn format_resource_profile(profile: &ResourceProfile, output_format: &str) -
     })
 }
 
+>>>>>>> origin/main
 pub fn print_state_diff(diff: &StateDiff, output_format: &str) -> anyhow::Result<()> {
     match OutputMode::parse(output_format) {
         OutputMode::Json => println!("{}", serde_json::to_string_pretty(diff)?),
