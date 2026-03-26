@@ -1,0 +1,229 @@
+.
+├── apps
+│   ├── server
+│   │   ├── package.json
+│   │   ├── src
+│   │   │   ├── config.ts
+│   │   │   ├── index.ts
+│   │   │   ├── routes
+│   │   │   │   ├── health.ts
+│   │   │   │   ├── replay.ts
+│   │   │   │   └── session.ts
+│   │   │   ├── workers
+│   │   │   │   ├── queue.ts
+│   │   │   │   └── replay.worker.ts
+│   │   │   └── ws
+│   │   │       └── trace-stream.ts
+│   │   └── tsconfig.json
+│   └── web
+│       ├── next-env.d.ts
+│       ├── next.config.ts
+│       ├── package-lock.json
+│       ├── package.json
+│       ├── src
+│       │   ├── app
+│       │   │   ├── debug
+│       │   │   │   └── page.tsx
+│       │   │   ├── decode
+│       │   │   │   └── page.tsx
+│       │   │   ├── globals.css
+│       │   │   ├── layout.tsx
+│       │   │   ├── page.tsx
+│       │   │   └── trace
+│       │   │       └── page.tsx
+│       │   ├── components
+│       │   │   ├── debug
+│       │   │   │   ├── BreakpointManager.tsx
+│       │   │   │   ├── ComparisonView.tsx
+│       │   │   │   ├── StateInspector.tsx
+│       │   │   │   ├── StepControls.tsx
+│       │   │   │   └── WhatIfEditor.tsx
+│       │   │   ├── decode
+│       │   │   │   ├── ContextSummary.tsx
+│       │   │   │   ├── ContractErrorView.tsx
+│       │   │   │   ├── DecodeForm.tsx
+│       │   │   │   ├── ErrorCard.tsx
+│       │   │   │   └── SuggestedFixes.tsx
+│       │   │   ├── index.ts
+│       │   │   ├── layout
+│       │   │   │   ├── Footer.tsx
+│       │   │   │   ├── Header.tsx
+│       │   │   │   └── NetworkSwitcher.tsx
+│       │   │   ├── shared
+│       │   │   │   ├── JsonTreeView.tsx
+│       │   │   │   ├── LoadingSpinner.tsx
+│       │   │   │   └── XdrViewer.tsx
+│       │   │   └── trace
+│       │   │       ├── DiagnosticEvents.tsx
+│       │   │       ├── ExecutionTimeline.tsx
+│       │   │       ├── ResourceProfile.tsx
+│       │   │       └── StateDiffViewer.tsx
+│       │   ├── hooks
+│       │   │   ├── useDecode.ts
+│       │   │   ├── useTrace.ts
+│       │   │   └── useWebSocket.ts
+│       │   ├── lib
+│       │   │   ├── api.ts
+│       │   │   ├── types.ts
+│       │   │   └── wasm.ts
+│       │   └── store
+│       │       ├── network.ts
+│       │       └── session.ts
+│       └── tsconfig.json
+├── Cargo.toml
+├── CONTRIBUTING.md
+├── crates
+│   ├── cli
+│   │   ├── build.rs
+│   │   ├── Cargo.toml
+│   │   ├── error.txt
+│   │   └── src
+│   │       ├── commands
+│   │       │   ├── clean.rs
+│   │       │   ├── db.rs
+│   │       │   ├── decode.rs
+│   │       │   ├── diff.rs
+│   │       │   ├── export.rs
+│   │       │   ├── inspect.rs
+│   │       │   ├── mod.rs
+│   │       │   ├── profile.rs
+│   │       │   ├── replay.rs
+│   │       │   ├── serve.rs
+│   │       │   ├── trace.rs
+│   │       │   └── whatif.rs
+│   │       ├── config.rs
+│   │       ├── main.rs
+│   │       ├── output
+│   │       │   ├── auth_tree.rs
+│   │       │   ├── compact.rs
+│   │       │   ├── human.rs
+│   │       │   ├── json.rs
+│   │       │   ├── mod.rs
+│   │       │   ├── renderers.rs
+│   │       │   └── trace_tree.rs
+│   │       └── tui
+│   │           ├── app.rs
+│   │           ├── mod.rs
+│   │           ├── state.rs
+│   │           └── widgets
+│   │               ├── controls.rs
+│   │               ├── inspector.rs
+│   │               ├── mod.rs
+│   │               └── timeline.rs
+│   ├── core
+│   │   ├── Cargo.toml
+│   │   └── src
+│   │       ├── cache
+│   │       │   ├── mod.rs
+│   │       │   └── store.rs
+│   │       ├── debugger
+│   │       │   ├── breakpoint.rs
+│   │       │   ├── mod.rs
+│   │       │   ├── stepping.rs
+│   │       │   └── whatif.rs
+│   │       ├── decode
+│   │       │   ├── context.rs
+│   │       │   ├── contract_error.rs
+│   │       │   ├── diagnostic.rs
+│   │       │   ├── host_error.rs
+│   │       │   ├── mod.rs
+│   │       │   └── report.rs
+│   │       ├── lib.rs
+│   │       ├── network
+│   │       │   ├── archive.rs
+│   │       │   ├── config.rs
+│   │       │   ├── mod.rs
+│   │       │   └── rpc.rs
+│   │       ├── replay
+│   │       │   ├── differ.rs
+│   │       │   ├── mod.rs
+│   │       │   ├── profiler.rs
+│   │       │   ├── sandbox.rs
+│   │       │   ├── state.rs
+│   │       │   └── trace.rs
+│   │       ├── spec
+│   │       │   ├── decoder.rs
+│   │       │   └── mod.rs
+│   │       ├── taxonomy
+│   │       │   ├── data
+│   │       │   │   ├── auth.toml
+│   │       │   │   ├── budget.toml
+│   │       │   │   ├── context.toml
+│   │       │   │   ├── contract.toml
+│   │       │   │   ├── crypto.toml
+│   │       │   │   ├── events.toml
+│   │       │   │   ├── object.toml
+│   │       │   │   ├── storage.toml
+│   │       │   │   ├── value.toml
+│   │       │   │   └── wasm.toml
+│   │       │   ├── loader.rs
+│   │       │   ├── mod.rs
+│   │       │   └── schema.rs
+│   │       ├── types
+│   │       │   ├── config.rs
+│   │       │   ├── error.rs
+│   │       │   ├── mod.rs
+│   │       │   ├── report.rs
+│   │       │   └── trace.rs
+│   │       └── xdr
+│   │           ├── codec.rs
+│   │           └── mod.rs
+│   └── wasm
+│       ├── Cargo.toml
+│       └── src
+│           └── lib.rs
+├── docs
+│   ├── architecture.md
+│   ├── contributing-taxonomy.md
+│   ├── INTEGRATION-GUIDE.md
+│   ├── replay-internals.md
+│   └── websocket-flow-diagram.md
+├── examples
+│   └── websocket-client.js
+├── extensions
+│   └── vscode
+│       ├── package.json
+│       ├── src
+│       │   ├── cli
+│       │   │   └── bridge.ts
+│       │   ├── extension.ts
+│       │   ├── panels
+│       │   │   └── diagnosticsPanel.ts
+│       │   ├── providers
+│       │   │   ├── codeLens.ts
+│       │   │   ├── diagnostics.ts
+│       │   │   ├── hover.ts
+│       │   │   └── quickFix.ts
+│       │   └── utils
+│       │       ├── config.ts
+│       │       └── parser.ts
+│       └── tsconfig.json
+├── package.json
+├── patches
+│   └── futures-macro-0.3.31
+│       ├── Cargo.toml
+│       ├── Cargo.toml.orig
+│       └── src
+│           ├── executor.rs
+│           ├── join.rs
+│           ├── lib.rs
+│           ├── select.rs
+│           └── stream_select.rs
+├── pnpm-lock.yaml
+├── pnpm-workspace.yaml
+├── README.md
+├── rust-toolchain.toml
+├── scripts
+│   ├── build-wasm.ps1
+│   └── taxonomy_diff.py
+├── tests
+│   ├── fixtures
+│   │   └── transactions
+│   │       ├── auth_failed.json
+│   │       ├── budget_exceeded.json
+│   │       └── contract_error.json
+│   └── integration
+│       └── decode_test.rs
+└── tree.txt
+
+60 directories, 167 files
