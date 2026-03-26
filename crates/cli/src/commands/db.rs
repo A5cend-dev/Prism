@@ -32,10 +32,14 @@ pub async fn run(args: DbArgs) -> Result<()> {
         }
         DbCommands::Stats => {
             let db = prism_core::taxonomy::loader::TaxonomyDatabase::load_embedded()?;
-            println!("Taxonomy database: {} entries", db.len());
+            if !*quiet {
+                println!("Taxonomy database: {} entries", db.len());
+            }
         }
         DbCommands::Search { query } => {
-            println!("Searching for: {query}");
+            if !*quiet {
+                println!("Searching for: {query}");
+            }
             // TODO: Search taxonomy entries
         }
     }

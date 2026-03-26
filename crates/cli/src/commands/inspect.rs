@@ -32,7 +32,10 @@ pub async fn run(
         args.op_index
     ).await?;
 
-    spinner.finish_and_clear();
+        spinner.finish_and_clear();
+    } else {
+        let report = prism_core::decode::decode_transaction(&args.tx_hash, network).await?;
+    }
 
     // Inspect shows the full context including decoded args, auth, resources, fees
     match output_format {

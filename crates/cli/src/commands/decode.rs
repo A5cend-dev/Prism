@@ -41,7 +41,10 @@ pub async fn run(
 
     let report = prism_core::decode::decode_transaction(&args.hash, network).await?;
 
-    spinner.finish_and_clear();
+        spinner.finish_and_clear();
+    } else {
+        let report = prism_core::decode::decode_transaction(&args.tx_hash, network).await?;
+    }
 
     let effective_output = if args.short { "short" } else { output_format };
     crate::output::print_diagnostic_report(&report, effective_output)?;
