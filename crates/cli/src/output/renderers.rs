@@ -2,7 +2,8 @@
 //!
 //! This module contains specialized renderers for different output formats.
 
-use prism_core::types::report::{DiagnosticReport, SuggestedFix};
+use prism_core::types::report::{DiagnosticReport, SuggestedFix, TransactionContext};
+use tabled::{Table, Tabled};
 
 /// Renders a bulleted list of suggested fixes from the diagnostic report.
 ///
@@ -62,10 +63,50 @@ fn get_difficulty_badge(difficulty: &str) -> String {
     }
 }
 
+/// A single row in the context table representing a decoded argument.
+#[derive(Tabled)]
+struct ArgumentRow {
+    #[tabled(rename = "Argument")]
+    index: usize,
+    #[tabled(rename = "Value")]
+    value: String,
+}
+
+/// Renders decoded contract arguments as a clean table.
+///
+/// Displays arguments in a grid format with columns for Argument and Value.
+/// This makes it much easier to read than nested JSON when viewed in the terminal.
+pub fn render_context_table(context: &TransactionContext) -> String {
+    if context.arguments.is_empty() {
+        return String::new();
+    }
+
+    let rows: Vec<ArgumentRow> = context
+        .arguments
+        .iter()
+        .enumerate()
+        .map(|(index, value)| ArgumentRow {
+            index: index + 1,
+            value: value.clone(),
+        })
+        .collect();
+
+    let table = Table::new(rows).to_string();
+    
+    let mut output = String::new();
+    if let Some(function_name) = &context.function_name {
+        output.push_str(&format!("Function: {}\n", function_name));
+    }
+    output.push_str("Arguments:\n");
+    output.push_str(&table);
+    
+    output
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use prism_core::types::report::Severity;
+    use prism_core::types::report::{FeeBreakdown, ResourceSummary, Severity};
 
     fn create_test_report() -> DiagnosticReport {
         DiagnosticReport {
@@ -159,5 +200,69 @@ mod tests {
         assert_eq!(get_difficulty_badge("medium"), " [medium]");
         assert_eq!(get_difficulty_badge("hard"), " [hard]");
         assert_eq!(get_difficulty_badge("unknown"), "");
+    }
+
+    #[test]
+    fn test_render_context_table_with_arguments() {
+        let context = TransactionContext {
+            tx_hash: "abc123".to_string(),
+            ledger_sequence: 12345,
+            function_name: Some("transfer".to_string()),
+            arguments: vec![
+                "GABC123...".to_string(),
+                "GDEF456...".to_string(),
+                "1000".to_string(),
+            ],
+            fee: FeeBreakdown {
+                inclusion_fee: 100,
+                resource_fee: 50,
+                refundable_fee: 25,
+                non_refundable_fee: 25,
+            },
+            resources: ResourceSummary {
+                cpu_instructions_used: 1000,
+                cpu_instructions_limit: 10000,
+                memory_bytes_used: 5000,
+                memory_bytes_limit: 50000,
+                read_bytes: 1000,
+                write_bytes: 500,
+            },
+        };
+
+        let output = render_context_table(&context);
+        
+        assert!(output.contains("Function: transfer"));
+        assert!(output.contains("Arguments:"));
+        assert!(output.contains("GABC123..."));
+        assert!(output.contains("GDEF456..."));
+        assert!(output.contains("1000"));
+    }
+
+    #[test]
+    fn test_render_context_table_empty() {
+        let context = TransactionContext {
+            tx_hash: "abc123".to_string(),
+            ledger_sequence: 12345,
+            function_name: None,
+            arguments: vec![],
+            fee: FeeBreakdown {
+                inclusion_fee: 100,
+                resource_fee: 50,
+                refundable_fee: 25,
+                non_refundable_fee: 25,
+            },
+            resources: ResourceSummary {
+                cpu_instructions_used: 1000,
+                cpu_instructions_limit: 10000,
+                memory_bytes_used: 5000,
+                memory_bytes_limit: 50000,
+                read_bytes: 1000,
+                write_bytes: 500,
+            },
+        };
+
+        let output = render_context_table(&context);
+        
+        assert!(output.is_empty());
     }
 }
